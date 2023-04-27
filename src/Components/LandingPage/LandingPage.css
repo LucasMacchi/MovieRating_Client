@@ -1,0 +1,28 @@
+#userNameIcon {
+    margin: 30px;
+    display: flex;
+}
+#loginButtonDiv {
+    margin: 30px;
+}
+/*
+#topDiv{
+    display: flex;
+    justify-content: space-between;
+}
+*/
+#searchDiv{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    
+}
+#searchBtn{
+    margin-left: 10px;
+}
+img {
+    width: 300px;
+    height: 300px;
+}
