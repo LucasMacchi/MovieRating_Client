@@ -1,0 +1,12 @@
+#cardPagdiv{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+#cardsDiv{
+    margin: 10px;
+    display: inline-flex;
+    height: 600px;
+    width: 1200px;
+}

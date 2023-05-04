@@ -1,8 +1,10 @@
 import {AnyAction, Dispatch, PayloadAction, createSlice} from "@reduxjs/toolkit";
 import axios from 'axios';
+import { stat } from "fs";
 
 
-const apiURL = "http://localhost:3400"
+const apiURL = process.env.REACT_APP_API_URL
+const size = process.env.REACT_APP_SIZE_ARRAY_MOVIES
 export interface movies {
     movieId:string,
     name:string,
@@ -14,24 +16,17 @@ export interface moviesArray {
 
 export const movieSlice = createSlice({
     name: "movies",
-    initialState: [] as movies[],
+    initialState: [] as Array<movies[]>,
     reducers: {
-        testUse: (state) => {
-            const testMov = {
-                movieId: "df",
-                name: "xd",
-                imageUrl: "dada"
-            }
-            state.push(testMov);
-            console.log(state)
-        },
-        searchMovies: (state, action: PayloadAction<movies[]>) => {
+        searchMovies: (state, action: PayloadAction<Array<movies[]>>) => {
             action.payload.forEach(element => {
                 state.push(element)
             });
         },
         emptyMovies: (state) => {
-            state = []
+            while(state.length) {
+                state.pop()
+            }
         },
         getMovies: (state) => {
             console.log(state.length)
@@ -39,12 +34,12 @@ export const movieSlice = createSlice({
     },
 })
 
-export const {testUse, searchMovies, emptyMovies, getMovies} = movieSlice.actions
+export const {searchMovies, emptyMovies, getMovies} = movieSlice.actions
 export default movieSlice.reducer
 
 
 export const searchMoviesByName =  (name:string ) => (dispatch: Dispatch<AnyAction>) => {
-    axios.get(apiURL+"/movie/"+name).then(data => {
+    axios.get(apiURL+"/movie/"+name+"/"+size).then(data => {
         dispatch(searchMovies(data.data))
     })
 }

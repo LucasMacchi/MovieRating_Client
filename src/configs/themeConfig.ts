@@ -7,6 +7,9 @@ const theme = createTheme({
         },
         secondary:{
             main: "#271f1f"
+        },
+        background:{
+            paper: "#271f1f"
         }
     }
 })
