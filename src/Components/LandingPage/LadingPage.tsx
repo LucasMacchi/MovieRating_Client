@@ -16,7 +16,7 @@ import { useAppDispatch, useAppSelector } from '../../Store/hooks';
 
 export default function LandingPage() {
 
-    const movies = useAppSelector((state) => state.movies)
+    const movies = useAppSelector((state) => state.moviesSlice)
     
     const [search, setSearch] = useState("")
     const [error, setError] = useState({
@@ -25,12 +25,13 @@ export default function LandingPage() {
     })
     const [loading, setLoading] = useState(false)
 
-
+    
     const login = false 
     const dispatcher = useAppDispatch()
 
     //Updates the search bar 
     const searchBarData = (e: string) => {
+        checkMovies()
         setSearch(e)
     }
 
@@ -38,25 +39,14 @@ export default function LandingPage() {
     const searchMovieSubmit = (e: any) => {
         setTimeout(() => {
             setLoading(false)
-            e.preventDefault()
-            dispatcher(searchMoviesByName(search))
         }, 2000)
-        e.preventDefault()
-        dispatcher(emptyMovies())
         setLoading(true)
-    }
-
-    useEffect(() => {
         dispatcher(emptyMovies())
-    },[])
+        dispatcher(searchMoviesByName(search))
+        e.preventDefault()
 
-    const showLoading = () => {
-        if(loading){
-            return(
-                <CircularProgress color="secondary" sx={{marginLeft: 3, }}/>
-            )
-        }
     }
+
 
     const logoSmall = [100, 100]
     const logoBig = [300, 300]
@@ -74,13 +64,11 @@ export default function LandingPage() {
         }
 
     }
-
-    /* Error checker
     const checkMovies = () => {
-        if(!movies.length){
+        if(search.length < 2){
             setError({
                 error: true,
-                message: "Can't find movies that match the one searched."
+                message: "Name is to short."
             })
         }
         else{
@@ -90,7 +78,10 @@ export default function LandingPage() {
             })
         }
     }
-    */
+    
+    window.addEventListener("beforeunload", () => {
+        dispatcher(emptyMovies())
+    })
 
     const loginShower = () => {
         if(login){
@@ -113,8 +104,12 @@ export default function LandingPage() {
     const moviesCards = () => {
         if(movies.length > 0){
             return(
-                <MoviesCards/>
+                <div>
+                    {loading ? <CircularProgress color="secondary" size={40} sx={{marginTop: 8, }}/> : <MoviesCards/>}
+                </div>
+                
             )
+
         }
     }
 
@@ -140,8 +135,7 @@ export default function LandingPage() {
                             error={error.error}
                             helperText={error.message}
                             />
-                            <Button type="submit" id="searchBtn" variant="contained" color="secondary" startIcon={<SearchIcon/>}>SEARCH</Button>
-                            {showLoading()}
+                            <Button type="submit" id="searchBtn" variant="contained" color="secondary" startIcon={<SearchIcon/>} disabled={error.error}>SEARCH</Button>
                         </Box>
                     </Slide>
                 </div>

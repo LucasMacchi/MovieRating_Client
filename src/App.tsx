@@ -1,27 +1,23 @@
 import React from 'react';
-import {store} from './Store/store';
-import { Provider } from 'react-redux';
 import "./App.css";
+import { Route, Routes } from 'react-router-dom';
 
-import { ThemeProvider } from '@mui/material';
-import theme from './configs/themeConfig';
 
 
 //components
 import LandingPage from './Components/LandingPage/LadingPage';
+import MovieDetails from './Components/movieDetails/movieDetails';
 
 function App() {
 
 
 
   return (
-    <Provider store={store}>
-        <ThemeProvider theme={theme}>
-            <div id='appDiv'>
-              <LandingPage/>
-            </div>
-        </ThemeProvider>
-    </Provider>
+    <Routes>
+      <Route path='/' element={<LandingPage/>}/>
+      <Route path='/movie/:movieid' element={<MovieDetails/>}/>
+    </Routes>
+
   );
 }
 

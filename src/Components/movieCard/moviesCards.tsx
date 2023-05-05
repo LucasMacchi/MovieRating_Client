@@ -1,11 +1,11 @@
 import {  useAppSelector } from '../../Store/hooks';
+import {useNavigate} from "react-router-dom"
 import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
-import Slide from '@mui/material/Slide';
 import Pagination from '@mui/material/Pagination';
 import {   useState } from "react";
 import "./moviesCards.css"
@@ -15,14 +15,14 @@ import { movies } from '../../Store/moviesSlice';
 export default function MoviesCards () {
 
 
-    const movies = useAppSelector((state) => state.movies)
+    const movies = useAppSelector((state) => state.moviesSlice)
     const [pagination, setPage] = useState({
         size: 2,
         mountPages: movies.length,
         page: 1,
         index: 0
     })
-
+    const navigate = useNavigate()
     
     const changePage = (e: React.ChangeEvent<unknown>, value: number) => {
         setPage({
@@ -48,7 +48,7 @@ export default function MoviesCards () {
                         {m.name}
                     </Typography>
                     <CardActions>
-                        <Button variant='outlined'>OPEN</Button>
+                        <Button variant='outlined' onClick={() => navigate("/movie/"+m.movieId)}>OPEN</Button>
                     </CardActions>
                     </CardContent>
                 </Card>
