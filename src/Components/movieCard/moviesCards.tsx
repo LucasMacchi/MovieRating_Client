@@ -14,7 +14,6 @@ import { movies } from '../../Store/moviesSlice';
 
 export default function MoviesCards () {
 
-
     const movies = useAppSelector((state) => state.moviesSlice)
     const [pagination, setPage] = useState({
         size: 2,
@@ -37,7 +36,7 @@ export default function MoviesCards () {
             <div id='cardsDiv'>
             {movies[pagination.index].map((m:movies) => (
             
-                <Card sx={{maxHeight: 500, maxWidth: 300, margin: 5}} >
+                <Card sx={{maxHeight: 500, maxWidth: 300, margin: 5}} key={m.name}>
                     <CardMedia
                         sx={{ height: 300, width: 300 }}
                         image={m.imageUrl}

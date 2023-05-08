@@ -1,6 +1,5 @@
 import {AnyAction, Dispatch, PayloadAction, createSlice} from "@reduxjs/toolkit";
 import axios from 'axios';
-import { stat } from "fs";
 
 
 const apiURL = process.env.REACT_APP_API_URL

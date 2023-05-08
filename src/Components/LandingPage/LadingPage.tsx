@@ -5,7 +5,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button/Button';
 import TextField from '@mui/material/TextField'
 import { Box } from "@mui/material";
-import {  useEffect, useState } from "react";
+import {  useState } from "react";
 import MoviesCards from "../movieCard/moviesCards";
 import Zoom from '@mui/material/Zoom';
 import Slide from '@mui/material/Slide';
@@ -23,7 +23,7 @@ export default function LandingPage() {
         error: false,
         message: ""
     })
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
 
     
     const login = false 
