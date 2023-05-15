@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter} from "react-router-dom"
+import {CookiesProvider} from "react-cookie"
 
 //store
 
@@ -24,9 +25,11 @@ root.render(
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
           <ThemeProvider theme={theme}>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
+            <CookiesProvider>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </CookiesProvider>
           </ThemeProvider>
       </PersistGate>
     </Provider>

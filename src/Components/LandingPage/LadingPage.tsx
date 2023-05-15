@@ -17,6 +17,7 @@ import { useAppDispatch, useAppSelector } from '../../Store/hooks';
 export default function LandingPage() {
 
     const movies = useAppSelector((state) => state.moviesSlice)
+    const user = useAppSelector((state) => state.userSlice)
     
     const [search, setSearch] = useState("")
     const [error, setError] = useState({
