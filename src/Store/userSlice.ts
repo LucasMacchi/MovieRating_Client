@@ -38,6 +38,12 @@ export const loginUser = async (email: string, password: string): Promise<boolea
     return response
 }
 
+export const registerUser = async (email: string, password: string, dateBirth: string, username: string ) => {
+    const response = await axios.post(apiURL+"/user/create",{"email": email, "password": password, "dateofbirth": dateBirth, "username": username})
+    if(response) return "User created"
+    else return "error to create"
+}
+
 export const getUserInfo = (email: string) => (dispatch: Dispatch<AnyAction>) => {
     axios.get(apiURL+"/user/"+email).then(data => {
         const user: userData = {

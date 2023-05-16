@@ -14,11 +14,14 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { searchMoviesByName, emptyMovies } from "../../Store/moviesSlice";
 import { useAppDispatch, useAppSelector } from '../../Store/hooks';
 
+import Login from "../LoginPage/Login";
+
 export default function LandingPage() {
 
     const movies = useAppSelector((state) => state.moviesSlice)
     const user = useAppSelector((state) => state.userSlice)
     
+    const [Showlogin, setLogin] = useState(false)
     const [search, setSearch] = useState("")
     const [error, setError] = useState({
         error: false,
@@ -26,10 +29,8 @@ export default function LandingPage() {
     })
     const [loading, setLoading] = useState(false)
 
-    
-    const login = false 
     const dispatcher = useAppDispatch()
-
+    const login = false
     //Updates the search bar 
     const searchBarData = (e: string) => {
         checkMovies()
@@ -96,7 +97,7 @@ export default function LandingPage() {
         else{
             return(
                 <div id='userNameIcon'>
-                    <Button variant="contained" color="secondary">LOGIN</Button>
+                    <Button variant="contained" color="secondary" onClick={() => loginController()}>LOGIN</Button>
                 </div>
             )
         }
@@ -113,6 +114,20 @@ export default function LandingPage() {
 
         }
     }
+    const loginMenu = () => {
+        if(Showlogin){
+            return(
+                <Login/>
+             )
+        }
+    }
+    const loginController = () => {
+        setLogin(false)
+        setTimeout(() => {
+            setLogin(true)
+        }, 200);
+        
+    }
 
     return (
         <div>
@@ -121,6 +136,7 @@ export default function LandingPage() {
             </div>
 
             <div id="searchDiv">
+                {loginMenu()}
                 {logoHidder()}
                 <div>
                     <Slide in={true} direction="right">
@@ -142,6 +158,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                     {moviesCards()}
+                    
                 </div>
 
             </div>
