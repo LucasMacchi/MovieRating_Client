@@ -12,6 +12,7 @@ import Slide from '@mui/material/Slide';
 import CircularProgress from '@mui/material/CircularProgress';
 //redux
 import { searchMoviesByName, emptyMovies } from "../../Store/moviesSlice";
+import { loginMenu } from "../../Store/configSlice";
 import { useAppDispatch, useAppSelector } from '../../Store/hooks';
 
 import Login from "../LoginPage/Login";
@@ -20,8 +21,8 @@ export default function LandingPage() {
 
     const movies = useAppSelector((state) => state.moviesSlice)
     const user = useAppSelector((state) => state.userSlice)
+    const config = useAppSelector((state) => state.configSlice)
     
-    const [Showlogin, setLogin] = useState(false)
     const [search, setSearch] = useState("")
     const [error, setError] = useState({
         error: false,
@@ -97,7 +98,7 @@ export default function LandingPage() {
         else{
             return(
                 <div id='userNameIcon'>
-                    <Button variant="contained" color="secondary" onClick={() => loginController()}>LOGIN</Button>
+                    <Button variant="contained" color="secondary" onClick={() => dispatcher(loginMenu())}>LOGIN</Button>
                 </div>
             )
         }
@@ -114,19 +115,12 @@ export default function LandingPage() {
 
         }
     }
-    const loginMenu = () => {
-        if(Showlogin){
+    const loginRender = () => {
+        if(config.loginMenu){
             return(
                 <Login/>
              )
         }
-    }
-    const loginController = () => {
-        setLogin(false)
-        setTimeout(() => {
-            setLogin(true)
-        }, 200);
-        
     }
 
     return (
@@ -136,11 +130,11 @@ export default function LandingPage() {
             </div>
 
             <div id="searchDiv">
-                {loginMenu()}
+                {loginRender()}
                 {logoHidder()}
                 <div>
                     <Slide in={true} direction="right">
-                        <Box component="form" onSubmit={(e) => searchMovieSubmit(e)} sx={{width: 700,maxWidth: "100%", display: "flex"}}>
+                        <Box component="form" onSubmit={(e) => searchMovieSubmit(e)} sx={{width: 700,maxWidth: "100%", display: config.loginMenu ? "none" :"flex"}}>
                             <TextField
                             id="movieSearchBar"
                             label="Movie Search"
@@ -151,8 +145,10 @@ export default function LandingPage() {
                             color="secondary"
                             error={error.error}
                             helperText={error.message}
+                            disabled={config.loginMenu}
+                            
                             />
-                            <Button type="submit" id="searchBtn" variant="contained" color="secondary" startIcon={<SearchIcon/>} disabled={error.error}>SEARCH</Button>
+                            <Button type="submit" id="searchBtn" variant="contained" color="secondary" startIcon={<SearchIcon/>} disabled={error.error || config.loginMenu}>SEARCH</Button>
                         </Box>
                     </Slide>
                 </div>

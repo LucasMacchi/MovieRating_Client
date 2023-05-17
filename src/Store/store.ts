@@ -3,6 +3,7 @@ import moviesSlice from "./moviesSlice";
 import userSlice from "./userSlice";
 import detailSlice  from "./movieDetailsSlice";
 import movieReviewsSlice from "./movieReviewsSlice";
+import configSlice from "./configSlice";
 import storage from "redux-persist/lib/storage"
 import { persistReducer, persistStore } from "redux-persist";
 
@@ -10,7 +11,8 @@ const reducersCombined = combineReducers({
     moviesSlice,
     userSlice,
     detailSlice,
-    movieReviewsSlice
+    movieReviewsSlice,
+    configSlice
 })
 
 const persistConfig = {

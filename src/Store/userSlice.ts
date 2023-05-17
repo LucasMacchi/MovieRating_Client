@@ -1,6 +1,7 @@
 import {AnyAction, Dispatch, PayloadAction, createSlice} from "@reduxjs/toolkit";
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { review } from "./movieReviewsSlice";
+import { response } from "express";
 
 const apiURL = process.env.REACT_APP_API_URL
 
@@ -39,9 +40,38 @@ export const loginUser = async (email: string, password: string): Promise<boolea
 }
 
 export const registerUser = async (email: string, password: string, dateBirth: string, username: string ) => {
-    const response = await axios.post(apiURL+"/user/create",{"email": email, "password": password, "dateofbirth": dateBirth, "username": username})
-    if(response) return "User created"
-    else return "error to create"
+    try {
+        const response = await axios.post(apiURL+"/user/create",{"email": email, "password": password, "dateofbirth": dateBirth, "username": username})
+        if(response) return "User created"
+        else return "error to create"
+    } catch (error: any | AxiosError ) {
+        if(axios.isAxiosError(error)){
+            if(error.response){
+                const er: string = error.response.data
+                if(er.includes("Profiles_username_key")){
+                    return "username"
+                }
+                if(er.includes("Profiles_email_key")){
+                    return "email"
+                }
+            }
+           
+        }
+        
+
+    }
+
+}
+
+export const verifyUser = async (email: string, code: number) => {
+    try {
+        const response = await axios.post(apiURL+"/user/validate-user",{"email": email, "code": code})
+        if(response) return true
+        else return false
+    } catch (error) {
+        return false
+    }
+
 }
 
 export const getUserInfo = (email: string) => (dispatch: Dispatch<AnyAction>) => {

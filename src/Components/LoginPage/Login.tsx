@@ -1,26 +1,31 @@
-import { Box, TextField, Button, Backdrop, Alert, IconButton, Typography } from "@mui/material";
+import { Box, TextField, Button, Backdrop, Alert, IconButton, Typography, CircularProgress } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import LoginIcon from '@mui/icons-material/Login';
 import CreateIcon from '@mui/icons-material/Create';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { loginMenu } from "../../Store/configSlice";
 
 import React,{  useState, useEffect } from "react";
 //import {useCookies} from "react-cookie"
 import { useAppSelector, useAppDispatch } from "../../Store/hooks"
-import {loginUser, getUserInfo, registerUser } from "../../Store/userSlice";
+import {loginUser, getUserInfo, registerUser, verifyUser } from "../../Store/userSlice";
 import dayjs, { Dayjs } from "dayjs";
 
 export default function Login(){
 
     const dispacher =  useAppDispatch()
     const userGlobal = useAppSelector(state => state.userSlice)
+    const config = useAppSelector((state) => state.configSlice)
     //const [cookies, setCookies, removeCookies] = useCookies()
-
-    //const [test, setTest] = useState(false)
+    
+    const [verify, setVerify] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [codeActivation, setCodeActivation] = useState(true)
+    const [codeData, setCodeData] = useState("")
     const [signup, setSign] = useState(false)
-    const [backdrop, setBackdrop] = useState(true)
     const [error, setError] = useState(false)
     const d = new Date()
     const [date, setDate] = useState<Dayjs | null>(dayjs(""))
@@ -38,6 +43,8 @@ export default function Login(){
     const [errorPasswordCon, SetErrorPasswordCon] = useState({error: false, message: ""})
     const [errorUsername, SetErrorUsername] = useState({error: false, message: ""})
     const [errorDate, SetErrorDate] = useState({error: false, message: ""})
+    const [errorCode, SetErrorCode] = useState({error: false, message: ""})
+
 
     useEffect(() => {
         handleEmailErrors()
@@ -45,9 +52,10 @@ export default function Login(){
         handlePasswordConfirmation()
         handleUsernameError()
         handleDateError()
+        handleErrorCode()
         /////////////////////////
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[user, userSign, date])
+    },[user, userSign, date, codeData])
 
     useEffect(() => {clearData()},[signup])
 
@@ -75,6 +83,12 @@ export default function Login(){
             else {SetErrorUsername({error: false, message: ""})}
         }
     }
+    const handleErrorCode = () => {
+        const codeValidator = /^[0-9]*$/
+        if(!codeValidator.test(codeData) || codeData.length === 0) SetErrorCode({error: true, message: "Code contains only numbers"})
+        else {SetErrorCode({error: false, message: ""})}
+    }
+
     const handleDateError = () => {
         if(date && signup){
             if(date.diff(d, "year") > -18 || !userSign.dateBirth) {
@@ -126,6 +140,7 @@ export default function Login(){
             return false
         }
     }
+
     const handleLogin = async (e: any) => {
         e.preventDefault()
         if(!signup){
@@ -152,18 +167,56 @@ export default function Login(){
             }
         }
         else{
-            await registerUser(user.email, user.password, userSign.dateBirth, userSign.username)
+            const response = await registerUser(user.email, user.password, userSign.dateBirth, userSign.username)
+            if(response === "username"){
+                SetErrorUsername({error:true, message: "Username Already taken"})
+            }
+            else if( response === "email"){
+                SetErrorEmail({error:true, message: "Email Already taken"})
+            }
+            else{
+                setCodeActivation(true)
+            }
+            
         }
 
         
     }
     const handleLoginError = () => {
         if(error && !signup){
+            setTimeout(() => {
+                setError(false)
+            }, 5000);
             return(
                 <Alert variant="filled" severity="error">Email or Password is incorrect</Alert>
             )
         }
+        if(verify){
+            setTimeout(() => {
+                setVerify(false)
+            }, 5000);
+            return(
+                <Alert variant="filled" severity="success">Account created and verify!</Alert>
+            )
+        }
         
+    }
+
+    const handleVerify = async () => {
+        const response = await verifyUser(user.email, parseInt(codeData))
+        if(response){
+            setLoading(true)
+            setTimeout(() => {
+                setLoading(false)
+                setVerify(true)
+                setCodeActivation(false)
+                setSign(false)
+            }, 2000);
+        }
+        else{
+            SetErrorCode({error: true, message:"Wrong code!"})
+        }
+
     }
 
     const registerRender = () => {
@@ -205,49 +258,75 @@ export default function Login(){
 
     return (
         <div>
-            <Backdrop open={backdrop} >
+            <Backdrop open={config.loginMenu} >
             <Box component="form" onSubmit={(e) => handleLogin(e)} sx={{width: 400, minheight: 300, p: 5, borderRadius: 5}} bgcolor="Menu">
                 <Box sx={{display: "flex", justifyContent: "space-between"}}>
                     <Typography variant="h4" >{signup ? "Sign up" : "Login"}</Typography>
-                    <IconButton color="secondary" onClick={() => setBackdrop(false)}>
+                    <IconButton color="secondary" onClick={() => dispacher(loginMenu())}>
                         <CloseIcon/>
                     </IconButton>
                 </Box>
-                <TextField
-                    id="email"
-                    label="Email"
-                    value={user.email}
-                    onChange={(e) => handleEmail(e.target.value)}
-                    variant="outlined" 
-                    color="secondary"
-                    error={errorEmail.error}
-                    helperText={errorEmail.message}
-                    fullWidth
-                    sx={{marginTop: 4, marginBottom: 0}}
-                />
-                <TextField
-                    id="password"
-                    label="Password"
-                    value={user.password}
-                    onChange={(e) => handlePassword(e.target.value)}
-                    variant="outlined" 
-                    color="secondary"
-                    error={errorPassword.error}
-                    helperText={errorPassword.message}
-                    fullWidth
-                    sx={{marginTop: 2, marginBottom: 2}}
-                />
-                
-                {handleLoginError()}
-                {registerRender()}
-                <Box sx={{display: "flex", justifyContent: "space-between"}} >
-                    <Button onClick={() => setSign(!signup)} color="secondary" variant="contained" sx={{marginTop: 2}} endIcon={signup ? <LoginIcon/> : <CreateIcon/>} >
-                        {signup ? "LOGIN" : "SIGN UP"}
-                    </Button>
-                    <Button type="submit" disabled={handleBtnEnable()} color="secondary" variant="contained" sx={{marginTop: 2}} endIcon={signup ? <CreateIcon/> : <LoginIcon/>} >
-                    {signup ? "SIGN UP" : "LOGIN"}
-                    </Button>
+                    <Box sx={{display: codeActivation ? "none" : "block"}}>
+                    <TextField
+                        id="email"
+                        label="Email"
+                        value={user.email}
+                        onChange={(e) => handleEmail(e.target.value)}
+                        variant="outlined" 
+                        color="secondary"
+                        error={errorEmail.error}
+                        helperText={errorEmail.message}
+                        fullWidth
+                        sx={{marginTop: 4, marginBottom: 0}}
+                    />
+                    <TextField
+                        id="password"
+                        label="Password"
+                        value={user.password}
+                        onChange={(e) => handlePassword(e.target.value)}
+                        variant="outlined" 
+                        color="secondary"
+                        error={errorPassword.error}
+                        helperText={errorPassword.message}
+                        fullWidth
+                        sx={{marginTop: 2, marginBottom: 2}}
+                    />
+                    
+                    {handleLoginError()}
+                    {registerRender()}
+                    <Box sx={{display: "flex", justifyContent: "space-between"}} >
+                        <Button onClick={() => setSign(!signup)} color="secondary" variant="contained" sx={{marginTop: 2}} endIcon={signup ? <LoginIcon/> : <CreateIcon/>} >
+                            {signup ? "LOGIN" : "SIGN UP"}
+                        </Button>
+                        <Button type="submit" disabled={handleBtnEnable()} color="secondary" variant="contained" sx={{marginTop: 2}} endIcon={signup ? <CreateIcon/> : <LoginIcon/>} >
+                        {signup ? "SIGN UP" : "LOGIN"}
+                        </Button>
+                    </Box>
                 </Box>
+                <Box sx={{display: codeActivation ? "flex" : "none"}}>
+
+
+                    <TextField
+                            id="codeAc"
+                            label="ActivationCode"
+                            value={codeData}
+                            onChange={(e) => setCodeData(e.target.value)}
+                            variant="outlined" 
+                            color="secondary"
+                            error={errorCode.error}
+                            helperText={errorCode.message}
+                            fullWidth
+                            sx={{marginTop: 2, marginBottom: 2}}
+                    />
+
+                </Box>
+                <Box sx={{display: codeActivation ? "flex" : "none", justifyContent: "space-between"}}>
+                    <IconButton onClick={() => setCodeActivation(false)}>
+                        <ArrowBackIcon/>
+                    </IconButton>
+                    {loading ? <CircularProgress color="secondary"/> : <Button variant="contained" color="secondary" onClick={() => handleVerify()}>VERIFY</Button>}
+                </Box>
+
             </Box>
             </Backdrop>
 
