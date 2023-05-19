@@ -233,6 +233,7 @@ export default function Login(){
                     error={errorPasswordCon.error}
                     helperText={errorPasswordCon.message}
                     fullWidth
+                    type="password"
                     sx={{marginTop: 0, marginBottom: 2}}
                     />
                     <TextField
@@ -286,6 +287,7 @@ export default function Login(){
                         onChange={(e) => handlePassword(e.target.value)}
                         variant="outlined" 
                         color="secondary"
+                        type="password"
                         error={errorPassword.error}
                         helperText={errorPassword.message}
                         fullWidth
