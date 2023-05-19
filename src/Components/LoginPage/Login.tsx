@@ -6,10 +6,10 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { loginMenu } from "../../Store/configSlice";
+import { loginMenu, log } from "../../Store/configSlice";
 
 import React,{  useState, useEffect } from "react";
-//import {useCookies} from "react-cookie"
+import {useCookies} from "react-cookie"
 import { useAppSelector, useAppDispatch } from "../../Store/hooks"
 import {loginUser, getUserInfo, registerUser, verifyUser } from "../../Store/userSlice";
 import dayjs, { Dayjs } from "dayjs";
@@ -19,11 +19,11 @@ export default function Login(){
     const dispacher =  useAppDispatch()
     const userGlobal = useAppSelector(state => state.userSlice)
     const config = useAppSelector((state) => state.configSlice)
-    //const [cookies, setCookies, removeCookies] = useCookies()
+    const [cookies] = useCookies()
     
     const [verify, setVerify] = useState(false)
     const [loading, setLoading] = useState(false)
-    const [codeActivation, setCodeActivation] = useState(true)
+    const [codeActivation, setCodeActivation] = useState(false)
     const [codeData, setCodeData] = useState("")
     const [signup, setSign] = useState(false)
     const [error, setError] = useState(false)
@@ -141,7 +141,7 @@ export default function Login(){
         }
     }
 
-    const handleLogin = async (e: any) => {
+    const handleLogin = async (e: React.FormEvent<EventTarget>) => {
         e.preventDefault()
         if(!signup){
             console.log("Attemping Login")
@@ -151,16 +151,23 @@ export default function Login(){
                 if(validation){
                     console.log("Getting user info")
                     dispacher(getUserInfo(user.email))
-                    if(userGlobal.id){
-                        console.log("Logged!")
-                        setError(false)
-                        setUser({email: "", password: ""})
-                    }
-                    else{
-                        console.log("Error")
-                        setError(true)
-        
-                    }
+                    setLoading(true)
+                    setTimeout(() => {
+                        console.log(userGlobal.email)
+                        if(userGlobal.id){
+                            dispacher(log())
+                            setError(false)
+                            setLoading(false)
+                            dispacher(loginMenu())
+                            window.location.reload()
+                        }
+                        else{
+                            setLoading(false)
+                            setError(true)
+            
+                        }
+                    }, 1000);
+                    console.log(userGlobal.email)
                 }
             } catch (error) {
                 setError(true)
@@ -201,7 +208,7 @@ export default function Login(){
         }
         
     }
-
+    //Handles the user verify using the code sent to the email
     const handleVerify = async () => {
         const response = await verifyUser(user.email, parseInt(codeData))
         if(response){
@@ -217,6 +224,23 @@ export default function Login(){
             SetErrorCode({error: true, message:"Wrong code!"})
         }
 
+    }
+
+    //
+    const loadingBtn = () => {
+        if(loading){
+            return(
+                <CircularProgress color="secondary"/>
+            )
+            
+        }
+        else{
+            return(
+                <Button type="submit" disabled={handleBtnEnable()} color="secondary" variant="contained" sx={{marginTop: 2}} endIcon={signup ? <CreateIcon/> : <LoginIcon/>} >
+                {signup ? "SIGN UP" : "LOGIN"}
+                </Button>
+            )
+        }
     }
 
     const registerRender = () => {
@@ -300,9 +324,7 @@ export default function Login(){
                         <Button onClick={() => setSign(!signup)} color="secondary" variant="contained" sx={{marginTop: 2}} endIcon={signup ? <LoginIcon/> : <CreateIcon/>} >
                             {signup ? "LOGIN" : "SIGN UP"}
                         </Button>
-                        <Button type="submit" disabled={handleBtnEnable()} color="secondary" variant="contained" sx={{marginTop: 2}} endIcon={signup ? <CreateIcon/> : <LoginIcon/>} >
-                        {signup ? "SIGN UP" : "LOGIN"}
-                        </Button>
+                        {loadingBtn()}
                     </Box>
                 </Box>
                 <Box sx={{display: codeActivation ? "flex" : "none"}}>

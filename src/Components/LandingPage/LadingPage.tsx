@@ -4,21 +4,25 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button/Button';
 import TextField from '@mui/material/TextField'
-import { Box } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import {  useState } from "react";
 import MoviesCards from "../movieCard/moviesCards";
 import Zoom from '@mui/material/Zoom';
 import Slide from '@mui/material/Slide';
 import CircularProgress from '@mui/material/CircularProgress';
+import LogoutIcon from '@mui/icons-material/Logout';
+import {useCookies} from "react-cookie"
+
 //redux
 import { searchMoviesByName, emptyMovies } from "../../Store/moviesSlice";
-import { loginMenu } from "../../Store/configSlice";
+import { loginMenu, logout } from "../../Store/configSlice";
 import { useAppDispatch, useAppSelector } from '../../Store/hooks';
+import { logoutUser, emptyUserState } from "../../Store/userSlice";
 
 import Login from "../LoginPage/Login";
 
 export default function LandingPage() {
-
+    const [cookies] = useCookies()
     const movies = useAppSelector((state) => state.moviesSlice)
     const user = useAppSelector((state) => state.userSlice)
     const config = useAppSelector((state) => state.configSlice)
@@ -31,7 +35,7 @@ export default function LandingPage() {
     const [loading, setLoading] = useState(false)
 
     const dispatcher = useAppDispatch()
-    const login = false
+
     //Updates the search bar 
     const searchBarData = (e: string) => {
         checkMovies()
@@ -53,6 +57,7 @@ export default function LandingPage() {
 
     const logoSmall = [100, 100]
     const logoBig = [300, 300]
+    //"hiddes" loggo after searching for movies
     const logoHidder = () => {
         if(movies.length === 0){
             return (
@@ -67,6 +72,7 @@ export default function LandingPage() {
         }
 
     }
+    //Check if any movie was found
     const checkMovies = () => {
         if(search.length < 2){
             setError({
@@ -81,17 +87,20 @@ export default function LandingPage() {
             })
         }
     }
-    
+    //When the page is reload, the movies get reset
     window.addEventListener("beforeunload", () => {
         dispatcher(emptyMovies())
     })
-
+    //Renders the name of user or the login button
     const loginShower = () => {
-        if(login){
+        if(config.isLogged){
             return(
                 <div id='userNameIcon'>
                     <AccountCircleIcon color='secondary' fontSize='large'/>
-                    <Button color='secondary' >USERNAME</Button>
+                    <Button color='secondary' >{user.username}</Button>
+                    <IconButton onClick={() => logoutBtn()}>
+                      <LogoutIcon color="secondary"/>
+                    </IconButton>
                 </div>
             )
         }
@@ -103,7 +112,16 @@ export default function LandingPage() {
             )
         }
     }
-
+    const logoutBtn = async () => {
+        if(config.isLogged){
+            console.log(cookies.session_id)
+            await logoutUser(cookies.session_id, dispatcher)
+            dispatcher(logout())
+            window.location.reload()
+        }
+        
+    }
+    //renders the cards of movies or the loading circle
     const moviesCards = () => {
         if(movies.length > 0){
             return(
@@ -115,6 +133,7 @@ export default function LandingPage() {
 
         }
     }
+    //Renders the component to login
     const loginRender = () => {
         if(config.loginMenu){
             return(

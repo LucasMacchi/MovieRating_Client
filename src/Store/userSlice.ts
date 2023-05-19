@@ -27,15 +27,23 @@ export const userSlice = createSlice({
     reducers: {
         getUserData: (state, action: PayloadAction<userData>) => {
             return action.payload
+        },
+        emptyUserState: (state) => {
+            return {} as userData
         }
     },
 })
 
-export const {getUserData} = userSlice.actions
+export const {getUserData, emptyUserState} = userSlice.actions
 export default userSlice.reducer
 
 export const loginUser = async (email: string, password: string): Promise<boolean> => {
     const response =  await (await axios.post(apiURL+"/auth/login",{"email": email,"password": password},{withCredentials:true})).data
+    return response
+}
+
+export const logoutUser = async (session_id: string, dispatch: Dispatch<AnyAction>) => {
+    const response =  await (await axios.delete(apiURL+"/auth/logout/"+session_id,{withCredentials:true})).data
     return response
 }
 
@@ -84,7 +92,23 @@ export const getUserInfo = (email: string) => (dispatch: Dispatch<AnyAction>) =>
             likes: data.data.likes,
             reviews: data.data.reviews
         }
+
         dispatch(getUserData(user))
 
     })
 }
+
+export const getUserInfoFromSession = (session_id: string) => (dispatch: Dispatch<AnyAction>) => {
+    axios.get(apiURL+"/auth/"+session_id).then(data => {
+        const user: userData = {
+            id: data.data.id,
+            username: data.data.username,
+            email: data.data.email,
+            dateBirth: data.data.dateBirth,
+            likes: data.data.likes,
+            reviews: data.data.reviews
+        }
+        dispatch(getUserData(user))
+
+    })
+} 
