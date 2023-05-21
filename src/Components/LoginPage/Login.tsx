@@ -1,4 +1,4 @@
-import { Box, TextField, Button, Backdrop, Alert, IconButton, Typography, CircularProgress } from "@mui/material";
+import { Box, TextField, Button, Backdrop, Alert, IconButton, Typography, CircularProgress, Link } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import LoginIcon from '@mui/icons-material/Login';
 import CreateIcon from '@mui/icons-material/Create';
@@ -9,7 +9,6 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { loginMenu, log } from "../../Store/configSlice";
 
 import React,{  useState, useEffect } from "react";
-import {useCookies} from "react-cookie"
 import { useAppSelector, useAppDispatch } from "../../Store/hooks"
 import {loginUser, getUserInfo, registerUser, verifyUser } from "../../Store/userSlice";
 import dayjs, { Dayjs } from "dayjs";
@@ -19,8 +18,8 @@ export default function Login(){
     const dispacher =  useAppDispatch()
     const userGlobal = useAppSelector(state => state.userSlice)
     const config = useAppSelector((state) => state.configSlice)
-    const [cookies] = useCookies()
     
+    const [passReset, setPassReset] = useState(false)
     const [verify, setVerify] = useState(false)
     const [loading, setLoading] = useState(false)
     const [codeActivation, setCodeActivation] = useState(false)
@@ -112,6 +111,7 @@ export default function Login(){
 
     }
 
+    //Handles data change in texfields
     const handleEmail = (e: string) => {
         setUser({email: e, password: user.password})
     }
@@ -133,14 +133,23 @@ export default function Login(){
 
     }
     const handleBtnEnable = () => {
-        if(errorDate.error || errorEmail.error || errorPassword.error || errorPasswordCon.error || errorUsername.error || !user.password){
+        if(passReset) {
+            if(errorEmail.error){
+                return true
+            }
+            else{
+                return false
+            }
+        }
+        else if(errorDate.error || errorEmail.error || errorPassword.error || errorPasswordCon.error || errorUsername.error || !user.password){
             return true
         }
         else{
             return false
         }
     }
-
+    ///************************************** */
+    //handles login 
     const handleLogin = async (e: React.FormEvent<EventTarget>) => {
         e.preventDefault()
         if(!signup){
@@ -235,7 +244,15 @@ export default function Login(){
             
         }
         else{
+            if(passReset){
+                return(
+                    <Button type="submit" disabled={handleBtnEnable()} color="secondary" variant="contained" sx={{marginTop: 2}} endIcon={signup ? <CreateIcon/> : <LoginIcon/>} >
+                    SEND EMAIL
+                    </Button>
+                )
+            }
             return(
+                
                 <Button type="submit" disabled={handleBtnEnable()} color="secondary" variant="contained" sx={{marginTop: 2}} endIcon={signup ? <CreateIcon/> : <LoginIcon/>} >
                 {signup ? "SIGN UP" : "LOGIN"}
                 </Button>
@@ -315,9 +332,10 @@ export default function Login(){
                         error={errorPassword.error}
                         helperText={errorPassword.message}
                         fullWidth
-                        sx={{marginTop: 2, marginBottom: 2}}
+                        sx={{marginTop: 2, marginBottom: 2, display: passReset ? "none" : "block"}}
+                        
                     />
-                    
+                    {signup ? "" : <Link underline="hover" onClick={() => setPassReset(true)}>Forgot your password?</Link>}
                     {handleLoginError()}
                     {registerRender()}
                     <Box sx={{display: "flex", justifyContent: "space-between"}} >
@@ -328,8 +346,6 @@ export default function Login(){
                     </Box>
                 </Box>
                 <Box sx={{display: codeActivation ? "flex" : "none"}}>
-
-
                     <TextField
                             id="codeAc"
                             label="ActivationCode"
