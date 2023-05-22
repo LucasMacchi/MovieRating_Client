@@ -1,7 +1,6 @@
 import {AnyAction, Dispatch, PayloadAction, createSlice} from "@reduxjs/toolkit";
 import axios, { AxiosError } from 'axios';
 import { review } from "./movieReviewsSlice";
-import { response } from "express";
 
 const apiURL = process.env.REACT_APP_API_URL
 
@@ -112,3 +111,13 @@ export const getUserInfoFromSession = (session_id: string) => (dispatch: Dispatc
 
     })
 } 
+
+export const createTokenSendLink = async (email: string) => {
+    await axios.post(apiURL+"/user/passcode/"+email)
+    console.log("Link sent")
+}
+
+export const changePassword = async (token_id: string, newPassword: string) => {
+    const data = {"token_id": token_id, "newPassword": newPassword}
+    await axios.patch(apiURL+"/user/password",data)
+}

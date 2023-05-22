@@ -10,7 +10,7 @@ import { loginMenu, log } from "../../Store/configSlice";
 
 import React,{  useState, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../Store/hooks"
-import {loginUser, getUserInfo, registerUser, verifyUser } from "../../Store/userSlice";
+import {loginUser, getUserInfo, registerUser, verifyUser, createTokenSendLink } from "../../Store/userSlice";
 import dayjs, { Dayjs } from "dayjs";
 
 export default function Login(){
@@ -149,10 +149,10 @@ export default function Login(){
         }
     }
     ///************************************** */
-    //handles login 
+    //handles login, signups and passwords resets
     const handleLogin = async (e: React.FormEvent<EventTarget>) => {
         e.preventDefault()
-        if(!signup){
+        if(!signup && !passReset){
             console.log("Attemping Login")
             let validation = false
             try {
@@ -181,6 +181,13 @@ export default function Login(){
             } catch (error) {
                 setError(true)
             }
+        }
+        else if(passReset){
+            console.log("ATTEMPING LINK")
+            setLoading(true)
+            await createTokenSendLink(user.email)
+            dispacher(loginMenu())
+            
         }
         else{
             const response = await registerUser(user.email, user.password, userSign.dateBirth, userSign.username)
@@ -297,6 +304,23 @@ export default function Login(){
             )
         }
     }
+    //this function handles the go back arrow for the reset password mode
+    const auxBtn = () => {
+        if(passReset){
+            return(
+                <IconButton onClick={() => setPassReset(false)}>
+                    <ArrowBackIcon/>
+                </IconButton>
+            )
+        }
+        else{
+            return(
+                <Button onClick={() => setSign(!signup)} color="secondary" variant="contained" sx={{marginTop: 2}} endIcon={signup ? <LoginIcon/> : <CreateIcon/>} >
+                    {signup ? "LOGIN" : "SIGN UP"}
+                </Button>
+            )
+        }
+    }
 
     return (
         <div>
@@ -339,9 +363,7 @@ export default function Login(){
                     {handleLoginError()}
                     {registerRender()}
                     <Box sx={{display: "flex", justifyContent: "space-between"}} >
-                        <Button onClick={() => setSign(!signup)} color="secondary" variant="contained" sx={{marginTop: 2}} endIcon={signup ? <LoginIcon/> : <CreateIcon/>} >
-                            {signup ? "LOGIN" : "SIGN UP"}
-                        </Button>
+                        {auxBtn()}
                         {loadingBtn()}
                     </Box>
                 </Box>
