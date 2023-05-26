@@ -119,5 +119,6 @@ export const createTokenSendLink = async (email: string) => {
 
 export const changePassword = async (token_id: string, newPassword: string) => {
     const data = {"token_id": token_id, "newPassword": newPassword}
-    await axios.patch(apiURL+"/user/password",data)
+    const response = await axios.patch(apiURL+"/user/password",data)
+    return response
 }

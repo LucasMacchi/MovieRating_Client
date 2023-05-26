@@ -1,7 +1,9 @@
 import {  useState, useEffect } from "react";
+import {useNavigate} from "react-router-dom"
 import { Box, TextField, Button, Backdrop, Alert, IconButton, Typography, CircularProgress, Link } from "@mui/material";
 import KeyIcon from '@mui/icons-material/Key';
 import { changePassword } from "../../Store/userSlice";
+import { useParams } from "react-router-dom";
 
 export default function PasswordReset(){
 
@@ -10,6 +12,8 @@ export default function PasswordReset(){
         passwordCon: ""
     })
 
+    const {token} = useParams()
+    const navigate = useNavigate()
     useEffect(() => {
         handlePasswordErrors()
         handlePasswordConfirmation()
@@ -17,6 +21,9 @@ export default function PasswordReset(){
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[passwordData])
 
+    const [loading, setLoading] = useState(false)
+    const [success, setSuccess] = useState(false)
+    const [error, setError] = useState(false)
     const [errorPassword, SetErrorPassword] = useState({error: false, message: ""})
     const [errorPasswordCon, SetErrorPasswordCon] = useState({error: false, message: ""})
 
@@ -41,14 +48,61 @@ export default function PasswordReset(){
         else return false
     }
 
-    const handlePasswordSubmit = () => {
+    const loadingBtn = () => {
+        if(loading){
+            return(
+                <CircularProgress color="secondary"/>
+            )
+        }
+        else{
+            return(
+                <Button type="submit" disabled={handleBtnEnable()} color="secondary" variant="contained" sx={{marginTop: 2}} endIcon={<KeyIcon/>} >
+                CHANGE PASSWORD
+                </Button>
+            )
+        }
+    }
 
+    const alertHandler = () => {
+        if(success && !error){
+            return(
+                <Alert variant="filled" severity="success">Password successfully change!</Alert>
+            )
+        }
+        if(error && !success){
+            return(
+                <Alert variant="filled" severity="error">Error while changing password</Alert>
+            )
+        }
+    }
+
+    const handlePasswordSubmit = async (e: any) => {
+        e.preventDefault()
+        setLoading(true)
+        const response = await changePassword(token ? token : "NO TOKEN", passwordData.password)
+        setPasswords({password: "", passwordCon: ""})
+        if(response){
+            setTimeout(() => {
+                setLoading(false)
+                setSuccess(true)
+                
+            }, 2000);
+            setTimeout(() => {
+                navigate("/")
+            }, 3500);
+        }
+        else{
+            setTimeout(() => {
+                setLoading(false)
+                setError(true)
+            }, 2000);
+        }
     }
 
     return (
         <div>
             <Backdrop open={true}>
-            <Box component="form" onSubmit={(e) => handlePasswordSubmit()} sx={{width: 400, minheight: 300, p: 5, borderRadius: 5, justifyContent: "center"}} bgcolor="Menu">
+            <Box component="form" onSubmit={(e) => handlePasswordSubmit(e)} sx={{width: 400, minheight: 300, p: 5, borderRadius: 5, justifyContent: "center"}} bgcolor="Menu">
                 <Typography variant="h4" >RESET YOUR PASSWORD</Typography>
                 <TextField
                     id="password"
@@ -76,10 +130,9 @@ export default function PasswordReset(){
                     type="password"
                     sx={{marginTop: 2, marginBottom: 2}}
                 />
+                {alertHandler()}
                 <Box sx={{display: "flex", justifyContent: "flex-end"}}>
-                    <Button type="submit" disabled={handleBtnEnable()} color="secondary" variant="contained" sx={{marginTop: 2}} endIcon={<KeyIcon/>} >
-                        CHANGE PASSWORD
-                    </Button>
+                    {loadingBtn()}
                 </Box>
 
             </Box>

@@ -34,7 +34,7 @@ function App() {
       <Route path='/login' element={<Login/>}/>
       <Route path='/' element={<LandingPage/>}/>
       <Route path='/movie/:movieid' element={<MovieDetails/>}/>
-      <Route path='/reset' element={<PasswordReset/>}/>
+      <Route path='/reset/:token' element={<PasswordReset/>}/>
     </Routes>
 
   );
