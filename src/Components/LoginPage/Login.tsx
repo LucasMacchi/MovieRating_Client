@@ -6,15 +6,17 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { loginMenu, log } from "../../Store/configSlice";
+import { log } from "../../Store/configSlice";
 
 import React,{  useState, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../Store/hooks"
+import {useNavigate} from "react-router-dom"
 import {loginUser, getUserInfo, registerUser, verifyUser, createTokenSendLink } from "../../Store/userSlice";
 import dayjs, { Dayjs } from "dayjs";
 
 export default function Login(){
 
+    const navigate = useNavigate()
     const dispacher =  useAppDispatch()
     const userGlobal = useAppSelector(state => state.userSlice)
     const config = useAppSelector((state) => state.configSlice)
@@ -167,7 +169,7 @@ export default function Login(){
                             dispacher(log())
                             setError(false)
                             setLoading(false)
-                            dispacher(loginMenu())
+                            navigate("/")
                             window.location.reload()
                         }
                         else{
@@ -185,9 +187,7 @@ export default function Login(){
         else if(passReset){
             console.log("ATTEMPING LINK")
             setLoading(true)
-            await createTokenSendLink(user.email)
-            dispacher(loginMenu())
-            
+            await createTokenSendLink(user.email)            
         }
         else{
             const response = await registerUser(user.email, user.password, userSign.dateBirth, userSign.username)
@@ -234,6 +234,7 @@ export default function Login(){
                 setVerify(true)
                 setCodeActivation(false)
                 setSign(false)
+                navigate("/")
             }, 2000);
         }
         else{
@@ -324,11 +325,11 @@ export default function Login(){
 
     return (
         <div>
-            <Backdrop open={config.loginMenu} >
+            <Backdrop open={true} >
             <Box component="form" onSubmit={(e) => handleLogin(e)} sx={{width: 400, minheight: 300, p: 5, borderRadius: 5}} bgcolor="Menu">
                 <Box sx={{display: "flex", justifyContent: "space-between"}}>
                     <Typography variant="h4" >{signup ? "Sign up" : "Login"}</Typography>
-                    <IconButton color="secondary" onClick={() => dispacher(loginMenu())}>
+                    <IconButton color="secondary" onClick={() => navigate("/")}>
                         <CloseIcon/>
                     </IconButton>
                 </Box>

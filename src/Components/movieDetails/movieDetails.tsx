@@ -6,6 +6,7 @@ import { getReviewsFromMovie, emptyReviews, getReviewsRating } from "../../Store
 import { useParams } from "react-router-dom"
 import { CardMedia, Card, Typography, Box, Rating, Backdrop, CircularProgress } from "@mui/material"
 import ReviewCards from "../Review/Review"
+import ReviewMaker from "../ReviewMaker/ReviewMaker"
 
 export default function MovieDetails(){
 
@@ -32,6 +33,8 @@ export default function MovieDetails(){
 
     },[])
 
+
+
     useEffect(() => {
         setRating(getReviewsRating(reviews))
     },[reviews])
@@ -53,7 +56,7 @@ export default function MovieDetails(){
                 sx={{
                     width: 800,
                     height: 600, 
-                }}
+                 }}
                 >
                     <Box sx={{display: "flex", justifyContent: "center"}}>
                         <CardMedia
@@ -62,7 +65,7 @@ export default function MovieDetails(){
                         />
                     </Box>
                     
-                    <Rating name="Rating" readOnly value={rate} sx={{ display: "flex",justifyContent: "center", m: 5}}/>
+                    <Rating name="Rating" readOnly value={rate} size="large" sx={{ display: "flex",justifyContent: "center", m: 5}}/>
                     <Typography gutterBottom variant="h3" component="div" color="white" >
                         {details.name}
                     </Typography>
@@ -70,6 +73,7 @@ export default function MovieDetails(){
                         {details.synopsis}
                     </Typography>
                 </Card>
+                <ReviewMaker/>
                 <ReviewCards/>
                 </div>
             )
@@ -77,7 +81,7 @@ export default function MovieDetails(){
     }
 
     return(
-        <div>
+        <div id="DivDetails">
             {load()}
         </div>
     )

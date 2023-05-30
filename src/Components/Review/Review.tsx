@@ -21,7 +21,7 @@ export default function ReviewCards () {
     return(
         <div>
             {reviews.map((r,i) => (
-                <Card sx={{minwidth: 250,maxWidth: 450, minheight: 100,maxHeight:300, m: 5}} key={i}>
+                <Card sx={{width:700 ,minheight: 100,maxHeight:300, m: 5, borderRadius: 10}} key={i}>
                     <CardContent>
                         <Box sx={{display:"flex", justifyContent:"space-between"}}>
                             <Rating name="reviewRating" value={r.rating} readOnly/>

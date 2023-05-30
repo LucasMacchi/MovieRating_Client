@@ -122,3 +122,14 @@ export const changePassword = async (token_id: string, newPassword: string) => {
     const response = await axios.patch(apiURL+"/user/password",data)
     return response
 }
+
+export const postReview = async (user_id: string, movie_id: string, comment: string, rating: number) => {
+    const data = {
+        "user_id" : user_id,
+        "movie_id" : movie_id,
+        "comment" : comment,
+        "rating" : rating
+    }
+    const response = await axios.post(apiURL+"/review/create", data)
+    return response
+}

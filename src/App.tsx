@@ -10,7 +10,7 @@ import LandingPage from './Components/LandingPage/LadingPage';
 import MovieDetails from './Components/movieDetails/movieDetails';
 import Login from './Components/LoginPage/Login';
 import PasswordReset from './Components/PasswordReset/PasswordReset';
-
+import Header from './Components/Header/Header';
 function App() {
   const [cookies] = useCookies()
   const dispacher = useAppDispatch()
@@ -30,12 +30,16 @@ function App() {
   },[])
 
   return (
-    <Routes>
+    <div>
+      <Header/>
+      <Routes>
       <Route path='/login' element={<Login/>}/>
       <Route path='/' element={<LandingPage/>}/>
       <Route path='/movie/:movieid' element={<MovieDetails/>}/>
       <Route path='/reset/:token' element={<PasswordReset/>}/>
     </Routes>
+    </div>
+
 
   );
 }
