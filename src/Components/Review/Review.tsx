@@ -6,12 +6,14 @@ import FlagIcon from '@mui/icons-material/Flag';
 export default function ReviewCards () {
 
     const reviews = useAppSelector((state) => state.movieReviewsSlice)
+    const config = useAppSelector((state) => state.configSlice)
     const dispacher = useAppDispatch()
 
     const handleLike = (i: number) => {
         dispacher(giveLike(i))
         dispacher(checkLike(i))
         //---- dispacher gives a like to the review in the 
+        
     }
 
     const handleReportReview = (review_id: string) => {
@@ -37,7 +39,7 @@ export default function ReviewCards () {
                             {r.comment}
                         </Typography>
                         <Box sx={{display:"flex", justifyContent:"flex-end"}}>
-                            <IconButton onClick={() => handleLike(i)} color={r.likeGiven ? "primary" : "default"}>
+                            <IconButton onClick={() => handleLike(i)} color={r.likeGiven ? "primary" : "default"} disabled={!config.isLogged}>
                                 <ThumbUpAltIcon/>
                                 {r.likes}
                             </IconButton>

@@ -133,3 +133,20 @@ export const postReview = async (user_id: string, movie_id: string, comment: str
     const response = await axios.post(apiURL+"/review/create", data)
     return response
 }
+
+export const userLike = async (user_id: string, review_id: string) => {
+    const data = {
+        "user_id" : user_id,
+        "review_id" : review_id
+    }
+    const response = await axios.post(apiURL+"/user/like",data)
+    return response
+}
+export const userUnLike = async (user_id: string, review_id: string) => {
+    const data = {
+        "user_id" : user_id,
+        "review_id" : review_id
+    }
+    const response = await axios.post(apiURL+"/user/unlike",data)
+    return response
+}
