@@ -40,12 +40,16 @@ export const movieReviewsSlice = createSlice({
             else{
                 state[action.payload].likeGiven = false
             }
+        },
+        likeTrue: (state, action: PayloadAction<number>) => {
+            state[action.payload].likeGiven = true
         }
+
 
     }
 })
 
-export const {emptyReviews, getReviews, giveLike, checkLike} = movieReviewsSlice.actions
+export const {emptyReviews, getReviews, giveLike, checkLike, likeTrue} = movieReviewsSlice.actions
 export default movieReviewsSlice.reducer
 
 export const getReviewsFromMovie = (movieId: string) => (dispatch: Dispatch<AnyAction>) => {

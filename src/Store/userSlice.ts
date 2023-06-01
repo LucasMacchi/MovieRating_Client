@@ -4,12 +4,19 @@ import { review } from "./movieReviewsSlice";
 
 const apiURL = process.env.REACT_APP_API_URL
 
+export interface Like {
+    id: string,
+    user_id: string, 
+    review_id: string,
+    createdAt: string,
+}
+
 export interface userData {
     username: string,
     id: string,
     email: string,
     dateBirth: string,
-    likes: [],
+    likes: Like[],
     reviews: review[]
 }
 
@@ -139,7 +146,7 @@ export const userLike = async (user_id: string, review_id: string) => {
         "user_id" : user_id,
         "review_id" : review_id
     }
-    const response = await axios.post(apiURL+"/user/like",data)
+    const response = await axios.post(apiURL+"/user/like",data, {withCredentials: true})
     return response
 }
 export const userUnLike = async (user_id: string, review_id: string) => {
@@ -147,6 +154,6 @@ export const userUnLike = async (user_id: string, review_id: string) => {
         "user_id" : user_id,
         "review_id" : review_id
     }
-    const response = await axios.post(apiURL+"/user/unlike",data)
+    const response = await axios.delete(apiURL+"/user/unlike",{withCredentials: true,data})
     return response
 }
