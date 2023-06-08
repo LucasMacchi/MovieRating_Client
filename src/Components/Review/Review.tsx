@@ -14,10 +14,13 @@ export default function ReviewCards () {
     const dispacher = useAppDispatch()
 
     useEffect(() => {
-        for(let i = 0; i < reviews.length; i++){
-            if(user.likes[i].review_id === reviews[i].id) {
-                console.log("like")
-                dispacher(likeTrue(i))
+        if(config.isLogged && user.likes){
+            console.log("iside")
+            for(let i = 0; i < reviews.length; i++){
+                if(user.likes[i].review_id === reviews[i].id) {
+                    console.log("like")
+                    dispacher(likeTrue(i))
+                }
             }
         }
     },[])

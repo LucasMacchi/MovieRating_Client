@@ -11,6 +11,7 @@ import MovieDetails from './Components/movieDetails/movieDetails';
 import Login from './Components/LoginPage/Login';
 import PasswordReset from './Components/PasswordReset/PasswordReset';
 import Header from './Components/Header/Header';
+import UserPanel from './Components/UserPanel/UserPanel';
 function App() {
   const [cookies] = useCookies()
   const dispacher = useAppDispatch()
@@ -35,6 +36,7 @@ function App() {
       <Routes>
       <Route path='/login' element={<Login/>}/>
       <Route path='/' element={<LandingPage/>}/>
+      <Route path='/user' element={<UserPanel/>}/>
       <Route path='/movie/:movieid' element={<MovieDetails/>}/>
       <Route path='/reset/:token' element={<PasswordReset/>}/>
     </Routes>
