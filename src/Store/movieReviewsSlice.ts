@@ -58,6 +58,12 @@ export const getReviewsFromMovie = (movieId: string) => (dispatch: Dispatch<AnyA
     })
 }
 
+export const getReviewsFromUserLiked = (userId: string) => (dispatch: Dispatch<AnyAction>) => {
+    axios.get(apiURL+"/review/"+userId+"?type=l").then(data => {
+        dispatch(getReviews(data.data))
+    })
+}
+
 export const getReviewsRating  = (state: review[]) => {
     let total = 0
     const reviewsTotal = state.length
