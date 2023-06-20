@@ -119,9 +119,19 @@ export const getUserInfoFromSession = (session_id: string) => (dispatch: Dispatc
     })
 } 
 
+export const changeUsername = async (username:string, email: string) => {
+    const data = {
+        "username": username,
+        "email": email
+    }
+    const res = axios.patch(apiURL+"/user/patch-user",data, {withCredentials: true})
+    return res
+}
+
 export const createTokenSendLink = async (email: string) => {
     await axios.post(apiURL+"/user/passcode/"+email)
     console.log("Link sent")
+    return true
 }
 
 export const changePassword = async (token_id: string, newPassword: string) => {

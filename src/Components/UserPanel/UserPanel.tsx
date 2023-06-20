@@ -1,13 +1,11 @@
-import {Box, Button, Typography, Tab, Tabs, Fab, Card, CardContent, Rating, IconButton} from "@mui/material"
+import {Box, Button, Typography, Tab, Tabs, Fab, Card, CardContent, Rating, IconButton, Alert, Backdrop} from "@mui/material"
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAppSelector, useAppDispatch } from "../../Store/hooks"
-export default function UserPanel () {
-
-
-    
+import { createTokenSendLink, changeUsername } from "../../Store/userSlice";
+export default function UserPanel () {   
     //const userGlobal = useAppSelector(state => state.userSlice)
     const reviews = [
         {
@@ -166,6 +164,10 @@ export default function UserPanel () {
         ]
     }
 
+    const [backdrop, setBackdrop] = useState(false)
+    const [usernameChange, setUsernameChange] = useState("")
+    const [statusPasswordReset, setStatusPassword] = useState(0)
+    const [statusUserChange, setStatusUser] = useState(0)
     const [tabValue, setTabValue] = useState(0)
     const [info, setInfo] = useState({
         info: true,
@@ -182,22 +184,73 @@ export default function UserPanel () {
         }
     }
 
+    const handlePasswordChange = async () => {
+        try {
+            const res = await createTokenSendLink(userGlobal.email)
+            setStatusPassword(1)
+        } catch (error) {
+            setStatusPassword(2)
+        }
+        setTimeout(() => {
+            setStatusPassword(0)
+        }, 5000);
+    }
+    /*
+    const handleUsernameChange = async () => {
+        try {
+            
+            setStatusUser(1)
+        } catch (error) {
+            setStatusUser(2)
+        }
+        setTimeout(() => {
+            setStatusUser(0)
+        }, 5000);
+    }
+    */
+    const handleUsernameChange = async () => {
+        
+        
+    }
+    const usernameShower = () => {
+        
+    }
+    const statusShowerPass = () => {
+        if(statusPasswordReset === 1){
+            return(<Alert variant="filled" severity="success">Link for password change sent!</Alert>)
+        }
+        else if(statusPasswordReset === 2){
+            return(<Alert variant="filled" severity="error">Error while trying to sent the link</Alert>)
+        }
+    }
+    /*
+    const statusShowerUser = () => {
+        if(statusPasswordReset === 1){
+            return(<Alert variant="filled" severity="success">Link for password change sent!</Alert>)
+        }
+        else if(statusPasswordReset === 2){
+            return(<Alert variant="filled" severity="error">Error while trying to sent the link</Alert>)
+        }
+    }
+    */
     const shower = () => {
         //THIS RETURNS THE PANEL WITH THE USER INFORMATION
         if(info.info){
             //GIVE FUNTIONALITY TO THE EDIT BUTTONS****
             return(
                 <Box marginLeft="15px" >
+                    
                     <Typography marginTop="30px" variant="h4" color="white">{"Email: "+userGlobal.email}</Typography>
                     <Box sx={{display: "flex"}}>
                         <Typography marginTop="30px" variant="h4" color="white">{"Username: "+userGlobal.username}</Typography>
-                        <Fab sx={{marginLeft: 6, marginTop: 2.5}}><EditIcon/></Fab>
+                        <Fab sx={{marginLeft: 6, marginTop: 2.5}} onClick={handleUsernameChange}><EditIcon/></Fab>
                     </Box>
                     <Typography marginTop="30px" variant="h4" color="white">{"Date of Birth: "+userGlobal.dateBirth}</Typography>
                     <Box sx={{display: "flex"}}>
                         <Typography marginTop="30px" variant="h4" color="white">{"Password: *********"}</Typography>
-                        <Fab sx={{marginLeft: 6, marginTop: 2.5}}><EditIcon/></Fab>
+                        <Fab sx={{marginLeft: 6, marginTop: 2.5}} onClick={handlePasswordChange}><EditIcon/></Fab>
                     </Box>
+                    { statusShowerPass()}
                 </Box>
             )
         }
