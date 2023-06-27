@@ -36,11 +36,14 @@ export const userSlice = createSlice({
         },
         emptyUserState: (state) => {
             return {} as userData
+        },
+        changeUserLocal: (state, action: PayloadAction<string>) => {
+            state.username = action.payload
         }
     },
 })
 
-export const {getUserData, emptyUserState} = userSlice.actions
+export const {getUserData, emptyUserState, changeUserLocal} = userSlice.actions
 export default userSlice.reducer
 
 export const loginUser = async (email: string, password: string): Promise<boolean> => {

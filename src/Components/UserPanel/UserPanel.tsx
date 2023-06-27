@@ -1,12 +1,14 @@
-import {Box, Button, Typography, Tab, Tabs, Fab, Card, CardContent, Rating, IconButton, Alert, Backdrop} from "@mui/material"
+import {Box, Button, Typography, Tab, Tabs, Fab, Card, CardContent, Rating, IconButton, Alert, TextField, CircularProgress } from "@mui/material"
 import EditIcon from '@mui/icons-material/Edit';
+import CancelIcon from '@mui/icons-material/Cancel';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import { useState, useEffect } from "react"
 import { useAppSelector, useAppDispatch } from "../../Store/hooks"
-import { createTokenSendLink, changeUsername } from "../../Store/userSlice";
+import { createTokenSendLink, changeUsername, changeUserLocal } from "../../Store/userSlice";
 export default function UserPanel () {   
-    //const userGlobal = useAppSelector(state => state.userSlice)
+    const userGlobal = useAppSelector(state => state.userSlice)
+    /*
     const reviews = [
         {
             id: 'c08bc18a-4121-4712-9a26-3b5fb8b1eb59',
@@ -163,8 +165,10 @@ export default function UserPanel () {
               }
         ]
     }
-
-    const [backdrop, setBackdrop] = useState(false)
+    */
+    const [loadingUser, setLoadingUser] = useState(false)
+    const [userChange, setUserChange] = useState(false)
+    const [userError, setUserError] = useState({error: false, message: ""})
     const [usernameChange, setUsernameChange] = useState("")
     const [statusPasswordReset, setStatusPassword] = useState(0)
     const [statusUserChange, setStatusUser] = useState(0)
@@ -186,7 +190,7 @@ export default function UserPanel () {
 
     const handlePasswordChange = async () => {
         try {
-            const res = await createTokenSendLink(userGlobal.email)
+            await createTokenSendLink(userGlobal.email)
             setStatusPassword(1)
         } catch (error) {
             setStatusPassword(2)
@@ -209,11 +213,50 @@ export default function UserPanel () {
     }
     */
     const handleUsernameChange = async () => {
-        
+        try {
+            setLoadingUser(true)
+            await changeUsername(usernameChange, userGlobal.email)
+            setLoadingUser(false)
+            changeUserLocal(usernameChange)
+            window.location.reload()
+            setUserChange(false)
+        } catch (error) {
+            setUserError({error: true, message:"Try another Username!"})
+            setLoadingUser(false)
+            setTimeout(() => {
+                setUserError({error: false, message:""})
+            }, 5000);
+        }
         
     }
     const usernameShower = () => {
-        
+        if(userChange){
+            return(
+                <Box sx={{display: "flex"}}>
+                    <Typography marginTop="30px" variant="h4" color="white">{"Username: "}</Typography>
+                    <TextField 
+                    id="username" label="Username Change" value={usernameChange} 
+                    variant="filled" 
+                    color="primary"  
+                    error={userError.error} helperText={userError.message}
+                    margin="normal"
+                    sx={{ input: { color: "white" } }}
+                    onChange={(e) => setUsernameChange(e.target.value)}
+                    />
+                    {loadingUser ? <CircularProgress sx={{marginLeft: 6, marginTop: 2.5}}/> : ""}
+                    <Fab sx={{marginLeft: 6, marginTop: 2.5}} color="primary" onClick={() => handleUsernameChange()}><EditIcon/></Fab>
+                    <Fab sx={{marginLeft: 6, marginTop: 2.5}} color="error" onClick={() => setUserChange(false)}><CancelIcon/></Fab>
+                </Box>
+            )
+        }
+        else{
+            return(
+                <Box sx={{display: "flex"}}>
+                    <Typography marginTop="30px" variant="h4" color="white">{"Username: "+userGlobal.username}</Typography>
+                    <Fab sx={{marginLeft: 6, marginTop: 2.5}} onClick={() => setUserChange(true)}><EditIcon/></Fab>
+                </Box>
+            )
+        }
     }
     const statusShowerPass = () => {
         if(statusPasswordReset === 1){
@@ -241,10 +284,7 @@ export default function UserPanel () {
                 <Box marginLeft="15px" >
                     
                     <Typography marginTop="30px" variant="h4" color="white">{"Email: "+userGlobal.email}</Typography>
-                    <Box sx={{display: "flex"}}>
-                        <Typography marginTop="30px" variant="h4" color="white">{"Username: "+userGlobal.username}</Typography>
-                        <Fab sx={{marginLeft: 6, marginTop: 2.5}} onClick={handleUsernameChange}><EditIcon/></Fab>
-                    </Box>
+                    {usernameShower()}
                     <Typography marginTop="30px" variant="h4" color="white">{"Date of Birth: "+userGlobal.dateBirth}</Typography>
                     <Box sx={{display: "flex"}}>
                         <Typography marginTop="30px" variant="h4" color="white">{"Password: *********"}</Typography>
@@ -259,7 +299,7 @@ export default function UserPanel () {
         if(info.likes){
             // GIVE FUNCTIONALITY TO THE LIKE BUTTON****
             return(
-                reviews.map((r,i) => {
+                userGlobal.reviews.map((r,i) => {
                     return(
                         <Box sx={{marginTop: 5, marginBottom: 5}}>
                             <Card variant="outlined" sx={{width:700 ,minheight: 100,maxHeight:300, m: 5, borderRadius: 10}} key={i}>
